@@ -15,7 +15,7 @@ class Handler:
         self._env = env
         self._start_resp = start_resp
 
-        self.cfg = self._env['CFG']
+        self.cfg = self._env.get('CFG')
         self.db = Database(self.cfg)
 
         self.req = Request(self._env)
@@ -34,6 +34,7 @@ class Handler:
 
         if self.req.method == 'OPTIONS':
             self.resp.status_text(HttpStatusCode.OK)
+
             self._start_resp(self.resp.status, self.resp.headers)
             return [self.resp.body.encode('utf-8')]
 
@@ -43,6 +44,7 @@ class Handler:
         except Exception as ex:
             print(ex)
             self.resp.status_text(HttpStatusCode.INTERNAL_SERVER_ERROR)
+
             self._start_resp(self.resp.status, self.resp.headers)
             return [self.resp.body.encode('utf-8')]
         else:
@@ -52,6 +54,7 @@ class Handler:
         #     self.resp.body = json.dumps(self.resp.body)
 
         self.resp.status_text(HttpStatusCode.OK)
+
         self._start_resp(self.resp.status, self.resp.headers)
         return [self.resp.body.encode('utf-8')]
 
@@ -86,22 +89,26 @@ class Handler:
         path_info = path_info.strip('/')
         if not path_info.startswith('{0}/'.format(self.cfg['application']['static_path'].strip('/'))):
             self.resp.status_text(HttpStatusCode.NOT_FOUND)
+
             self._start_resp(self.resp.status, self.resp.headers)
             return [self.resp.body.encode('utf-8')]
 
         file_path = path.join(path.abspath('.'), path_info)
         if not path.exists(file_path) or not path.isfile(file_path):
             self.resp.status_text(HttpStatusCode.NOT_FOUND)
+
             self._start_resp(self.resp.status, self.resp.headers)
             return [self.resp.body.encode('utf-8')]
 
         if not os.access(file_path, os.R_OK):
             self.resp.status_text(HttpStatusCode.FORBIDDEN)
+
             self._start_resp(self.resp.status, self.resp.headers)
             return [self.resp.body.encode('utf-8')]
 
         if self.req.method not in ('GET', 'HEAD'):
             self.resp.status_text(HttpStatusCode.METHOD_NOT_ALLOWED)
+
             self._start_resp(self.resp.status, self.resp.headers)
             return [self.resp.body.encode('utf-8')]
 
@@ -113,5 +120,6 @@ class Handler:
         ])
 
         self.resp.status_text(HttpStatusCode.OK)
+
         self._start_resp(self.resp.status, self.resp.headers)
         return self.file_body(file_path)

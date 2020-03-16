@@ -8,15 +8,17 @@ class Request:
     def __init__(self, env):
         self.env = env
 
-        self.cfg = self.env['CFG']
+        self.cfg = self.env.get('CFG')
         self.method = self.env.get('REQUEST_METHOD')
         self.origin = self.env.get('HTTP_ORIGIN', '')
         self.content_type = env['CONTENT_TYPE']
 
         self.remote_ip_addr = ''
         self.remote_ip_addr_ends_with_asterisk = ''
+
         self.headers = {}
         self.cookies = {}
+
         self.form = None
         self.json = None
 

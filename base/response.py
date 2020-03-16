@@ -4,7 +4,7 @@ from libs.http_status import HttpStatus
 
 class Response:
     def __init__(self, env):
-        self.cfg = env['CFG']
+        self.cfg = env.get('CFG')
         self.status = ''
         self.headers = []
         self.body = ''
