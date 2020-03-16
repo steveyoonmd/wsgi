@@ -1,0 +1,29 @@
+{
+  "application": {
+    "static_path": "static",
+    "domain": "127.0.0.1"
+  },
+  "access_allowed_http_origins": [
+    "http://127.0.0.1:8000"
+  ],
+  "access_allowed_ip_addrs_end_with_asterisk": {
+    "127.0.0.*": "localhost ip"
+  },
+  "database_database1": {
+    "host": "localhost",
+    "user": "user1",
+    "password": "password1",
+    "charset": "utf8mb4",
+    "port": 3306
+  },
+  "text_mime_types": [
+    "text/plain",
+    "text/html",
+    "text/css",
+    "application/javascript",
+    "application/json"
+  ],
+  "aes_crypto": {
+    "key": "__this_is_your_aes_crypto_key__you_should_change_it__"
+  }
+}

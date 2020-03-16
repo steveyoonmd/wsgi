@@ -1,0 +1,7 @@
+.idea/
+__pycache__/
+mysqldiff/
+batches.json
+cfg.json
+tests.json
+tools.json
