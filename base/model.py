@@ -85,16 +85,17 @@ class Model:
 
         param_list = []
         where_clause = ''
-        if where != '':
-            if equal is not None:
-                where_clause = 'WHERE delete_time = 0 AND {0} = %s'.format(where)
-                param_list.append(equal)
-            elif like != '':
-                where_clause = 'WHERE delete_time = 0 AND {0} LIKE %s'.format(where)
-                param_list.append('%{0}%'.format(like))
-            elif len(in_) > 0:
-                where_clause = 'WHERE delete_time = 0 AND {0} IN (%s)'.format(where)
-                param_list.append(', '.join(in_))
+        if equal is not None:
+            where_clause = 'WHERE delete_time = 0 AND {0} = %s'.format(where)
+            param_list.append(equal)
+        elif like != '':
+            where_clause = 'WHERE delete_time = 0 AND {0} LIKE %s'.format(where)
+            param_list.append('%{0}%'.format(like))
+        elif len(in_) > 0:
+            where_clause = 'WHERE delete_time = 0 AND {0} IN (%s)'.format(where)
+            param_list.append(', '.join(in_))
+        else:
+            where_clause = 'WHERE delete_time = 0'
 
         order_clause = ''
         if order_asc != '':
@@ -117,8 +118,8 @@ class Model:
 
     def get(self, key):
         sql = 'SELECT * FROM {0}.{1} WHERE {2} = %s AND delete_time = 0 LIMIT 1 OFFSET 0'.format(self.db_name,
-                                                                                                  self.table_name,
-                                                                                                  self.primary_key)
+                                                                                                 self.table_name,
+                                                                                                 self.primary_key)
         params = (key,)
         self._print_if_debug(sql % params)
 
