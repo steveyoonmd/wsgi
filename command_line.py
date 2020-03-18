@@ -4,7 +4,7 @@ from wsgiref.util import setup_testing_defaults
 from base.application import Application
 
 
-def start_resp(status, headers, exc_info=None):
+def start_resp(status, headers):
     print(status)
     print(headers)
 

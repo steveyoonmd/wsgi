@@ -29,21 +29,21 @@ def main():
                                database=cfg[k]['database'], port=cfg[k]['port'], cursorclass=pymysql.cursors.DictCursor)
         cursor = conn.cursor()
 
-        cursor._execute('SHOW TABLES')
-        show_tables = cursor._fetchall()
+        cursor.execute('SHOW TABLES')
+        show_tables = cursor.fetchall()
 
         tables = []
         for show_table in show_tables:
             tables.append(show_table['Tables_in_' + cfg[k]['database']])
 
-        select_counts = []
+        # select_counts = []
         create_tables = []
         for table in tables:
             # cursor.execute('SELECT COUNT(*) AS _count_ FROM ' + table)
             # select_counts.append(cursor.fetchone()['_count_'])
 
-            cursor._execute('SHOW CREATE TABLE ' + table)
-            create_table = cursor._fetchone()['Create Table']
+            cursor.execute('SHOW CREATE TABLE ' + table)
+            create_table = cursor.fetchone()['Create Table']
 
             create_table_split = create_table.split(' ')
             create_table_split_new = []

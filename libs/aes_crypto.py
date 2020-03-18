@@ -28,8 +28,8 @@ class AESCrypto:
         return s + (padding * chr(padding))
 
     @classmethod
-    def unpad(cls, s):
-        return s[:-ord(s[len(s) - 1:])]
+    def unpad(cls, b):
+        return b[:-ord(b[len(b) - 1:])]
 
     def encrypt(self, plain_text):
         if not crypto_imported:

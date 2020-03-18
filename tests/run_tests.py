@@ -61,7 +61,7 @@ def users_login(var):
     print_if_debug(var, 'REQ: ' + http_post_params)
 
     req = Request(url, headers={
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json; charset=utf-8'
     })
 
     (resp, result) = send_http_request(var, req, http_post_params)
@@ -89,7 +89,7 @@ def tests1_test_get(var):
         'Cookie': var['cookie'],
     })
 
-    (resp, result) = send_http_request(var, req)
+    (_, result) = send_http_request(var, req)
 
     print('{0}: {1}'.format(result, func_name))
     print_if_debug(var, '\n')
@@ -110,7 +110,7 @@ def tests1_test_post(var):
         'Cookie': var['cookie'],
     })
 
-    (resp, result) = send_http_request(var, req, http_post_params)
+    (_, result) = send_http_request(var, req, http_post_params)
 
     print('{0}: {1}'.format(result, func_name))
     print_if_debug(var, '\n')
@@ -129,10 +129,10 @@ def tests2_test_json(var):
 
     req = Request(url, headers={
         'Cookie': var['cookie'],
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
     })
 
-    (resp, result) = send_http_request(var, req, http_post_params)
+    (_, result) = send_http_request(var, req, http_post_params)
 
     print('{0}: {1}'.format(result, func_name))
     print_if_debug(var, '\n')
@@ -148,10 +148,10 @@ def tests3_test_orm(var):
 
     req = Request(url, headers={
         'Cookie': var['cookie'],
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf=8',
     })
 
-    (resp, result) = send_http_request(var, req, http_post_params)
+    (_, result) = send_http_request(var, req, http_post_params)
 
     print('{0}: {1}'.format(result, func_name))
     print_if_debug(var, '\n')
@@ -167,10 +167,10 @@ def tests3_test_aes(var):
 
     req = Request(url, headers={
         'Cookie': var['cookie'],
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
     })
 
-    (resp, result) = send_http_request(var, req, http_post_params)
+    (_, result) = send_http_request(var, req, http_post_params)
 
     print('{0}: {1}'.format(result, func_name))
     print_if_debug(var, '\n')

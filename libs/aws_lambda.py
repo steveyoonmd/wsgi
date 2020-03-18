@@ -1,21 +1,3 @@
-# ISC License
-
-# Copyright (c) 2018-2020 Adam Johnson
-
-# Permission to use, copy, modify, and/or distribute this software for any
-# purpose with or without fee is hereby granted, provided that the above
-# copyright notice and this permission notice appear in all copies.
-
-# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-# REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
-# FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-# INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-# LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-# OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-# PERFORMANCE OF THIS SOFTWARE.
-
-# https://github.com/adamchainz/apig-wsgi
-
 import sys
 from base64 import b64decode
 from io import BytesIO
@@ -25,8 +7,8 @@ from base.application import Application
 
 def env(evt):
     this = {
-        'REQUEST_METHOD': evt['httpMethod'],
-        'PATH_INFO': evt['path'],
+        'REQUEST_METHOD': evt.get('httpMethod', 'GET'),
+        'PATH_INFO': evt.get('path', '/'),
         'SERVER_PROTOCOL': 'HTTP/1.1',
         'SERVER_NAME': 'localhost',
         'SERVER_PORT': '80',
@@ -67,11 +49,13 @@ def env(evt):
     # 1. AWS API Gateway -> Resources -> Create Method -> Use Lambda Proxy integration
     # 2. AWS API Gateway -> Settings -> Binary Media Types -> multipart/form-data
     # 3. Browser -> XMLHttpRequest -> xhr.setRequestHeader('Accept', 'multipart/form-data');
-    body = evt.get('body', '') or ''
+
+    evt_body = evt.get('body', '') or ''
+    body = b''
     if evt.get('isBase64Encoded', False):
-        body = b64decode(body)
+        body = b64decode(evt_body)
     else:
-        body = body.encode('utf-8')
+        body = evt_body.encode('utf-8')
 
     this['CONTENT_LENGTH'] = str(len(body))
     this['wsgi.input'] = BytesIO(body)
@@ -85,7 +69,7 @@ class AwsLambdaResponse:
         self.headers = []
         self.body = BytesIO()
 
-    def start(self, status, headers, exc_info=None):
+    def start(self, status, headers):
         self.statusCode = status[:3]
         self.headers.extend(headers)
 

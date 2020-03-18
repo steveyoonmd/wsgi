@@ -1,3 +1,4 @@
+import json
 import mimetypes
 import os
 from datetime import datetime
@@ -6,7 +7,7 @@ from os import path
 from base.database import Database
 from base.request import Request
 from base.response import Response
-from libs.session import Session
+from libs.date_time import DateTime
 from libs.enums import HttpStatusCode
 
 
@@ -15,12 +16,11 @@ class Handler:
         self._env = env
         self._start_resp = start_resp
 
-        self.cfg = self._env.get('CFG')
-        self.db = Database(self.cfg)
+        self.cfg = self._env.get('CFG', {})
 
+        self.db = Database(self.cfg)
         self.req = Request(self._env)
-        self.resp = Response(self._env)
-        self.sess = Session(self)
+        self.resp = Response(self.cfg)
 
     def handle_func(self, func):
         if self.req.origin != '' or self.req.origin in self.cfg['access_allowed_http_origins']:
@@ -33,33 +33,34 @@ class Handler:
             ])
 
         if self.req.method == 'OPTIONS':
-            self.resp.status_text(HttpStatusCode.OK)
-
+            self.resp.set_http_status(HttpStatusCode.OK)
             self._start_resp(self.resp.status, self.resp.headers)
-            return [self.resp.body.encode('utf-8')]
+            return []
 
         try:
             self.req.parse()
             func(self)
         except Exception as ex:
             print(ex)
-            self.resp.status_text(HttpStatusCode.INTERNAL_SERVER_ERROR)
 
+            self.resp.set_http_status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             self._start_resp(self.resp.status, self.resp.headers)
             return [self.resp.body.encode('utf-8')]
-        else:
+        finally:
             self.db.close()
 
-        # if not isinstance(self.resp.body, str):
-        #     self.resp.body = json.dumps(self.resp.body)
+        resp_content_type = ('Content-Type', 'text/plain; charset=utf-8')
+        if not isinstance(self.resp.body, str):
+            self.resp.body = json.dumps(self.resp.body)
+            resp_content_type = ('Content-Type', 'application/json; charset=utf-8')
+        self.resp.headers.append(resp_content_type)
 
-        self.resp.status_text(HttpStatusCode.OK)
-
+        self.resp.set_http_status(HttpStatusCode.OK)
         self._start_resp(self.resp.status, self.resp.headers)
         return [self.resp.body.encode('utf-8')]
 
     def file_type(self, file_path):
-        mime_type, encoding = mimetypes.guess_type(file_path)
+        mime_type, _ = mimetypes.guess_type(file_path)
 
         if mime_type not in self.cfg['text_mime_types']:
             return mime_type
@@ -88,27 +89,23 @@ class Handler:
     def handle_file(self, path_info):
         path_info = path_info.strip('/')
         if not path_info.startswith('{0}/'.format(self.cfg['application']['static_path'].strip('/'))):
-            self.resp.status_text(HttpStatusCode.NOT_FOUND)
-
+            self.resp.set_http_status(HttpStatusCode.NOT_FOUND)
             self._start_resp(self.resp.status, self.resp.headers)
             return [self.resp.body.encode('utf-8')]
 
         file_path = path.join(path.abspath('.'), path_info)
         if not path.exists(file_path) or not path.isfile(file_path):
-            self.resp.status_text(HttpStatusCode.NOT_FOUND)
-
+            self.resp.set_http_status(HttpStatusCode.NOT_FOUND)
             self._start_resp(self.resp.status, self.resp.headers)
             return [self.resp.body.encode('utf-8')]
 
         if not os.access(file_path, os.R_OK):
-            self.resp.status_text(HttpStatusCode.FORBIDDEN)
-
+            self.resp.set_http_status(HttpStatusCode.FORBIDDEN)
             self._start_resp(self.resp.status, self.resp.headers)
             return [self.resp.body.encode('utf-8')]
 
         if self.req.method not in ('GET', 'HEAD'):
-            self.resp.status_text(HttpStatusCode.METHOD_NOT_ALLOWED)
-
+            self.resp.set_http_status(HttpStatusCode.METHOD_NOT_ALLOWED)
             self._start_resp(self.resp.status, self.resp.headers)
             return [self.resp.body.encode('utf-8')]
 
@@ -116,10 +113,9 @@ class Handler:
             ('Content-Type', self.file_type(file_path)),
             ('Content-Length', str(os.stat(file_path).st_size)),
             ('Accept-Ranges', 'bytes'),
-            ('Last-Modified', datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')),
+            ('Last-Modified', DateTime(datetime.utcnow()).utc_str()),
         ])
 
-        self.resp.status_text(HttpStatusCode.OK)
-
+        self.resp.set_http_status(HttpStatusCode.OK)
         self._start_resp(self.resp.status, self.resp.headers)
         return self.file_body(file_path)

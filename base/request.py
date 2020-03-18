@@ -7,29 +7,26 @@ from urllib.parse import unquote
 class Request:
     def __init__(self, env):
         self.env = env
+        self.cfg = self.env.get('CFG', {})
 
-        self.cfg = self.env.get('CFG')
-        self.method = self.env.get('REQUEST_METHOD')
+        self.method = self.env.get('REQUEST_METHOD', 'GET')
+        self.path_info = env.get('PATH_INFO', '/')
         self.origin = self.env.get('HTTP_ORIGIN', '')
-        self.content_type = env['CONTENT_TYPE']
-
-        self.remote_ip_addr = ''
+        self.content_type = env.get('CONTENT_TYPE', '')
+        self.remote_ip_addr = self.env.get('REMOTE_ADDR', '')
         self.remote_ip_addr_ends_with_asterisk = ''
 
         self.headers = {}
         self.cookies = {}
-
         self.form = None
         self.json = None
 
     def parse(self):
-        self.remote_ip_addr = self.env.get('REMOTE_ADDR')
-
-        x_forwarded_for = self.env.get('X_FORWARDED_FOR')
-        if x_forwarded_for is not None:
+        x_forwarded_for = self.env.get('X_FORWARDED_FOR', '')
+        if x_forwarded_for != '':
             self.remote_ip_addr = x_forwarded_for.split(', ')[0]
 
-        if self.remote_ip_addr is not None:
+        if self.remote_ip_addr != '':
             remote_ip_addr_split = self.remote_ip_addr.split('.')
             remote_ip_addr_split.pop()
             remote_ip_addr_split.append('*')
@@ -39,9 +36,9 @@ class Request:
         http_cookie = self.env.get('HTTP_COOKIE', '')
         http_cookie_split = http_cookie.split('; ')
         for name_value in http_cookie_split:
-            if '=' not in name_value:
+            name_value_split = name_value.split('=', 1)
+            if len(name_value_split) != 2:
                 continue
-            name_value_split = name_value.split('=')
             self.cookies[unquote(name_value_split[0])] = unquote(name_value_split[1])
 
         if self.content_type.startswith('application/json'):
@@ -58,6 +55,9 @@ class Request:
         else:
             self.form = cgi.FieldStorage(
                 environ=self.env,
-                fp=self.env['wsgi.input'],
+                fp=self.env.get('wsgi.input'),
                 keep_blank_values=True,
             )
+
+    def get_cookie(self, name):
+        return self.cookies.get(name, '')

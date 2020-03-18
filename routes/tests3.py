@@ -2,13 +2,13 @@ from libs.aes_crypto import AESCrypto
 from models.test1 import Test1
 
 
-def test_orm(g):
-    test1 = Test1(db=g.db, debug=True)
+def test_orm(this):
+    test1 = Test1(db=this.db, debug=True)
 
     test1_get = test1.get(1)
     print('test1_get: {0}\n'.format(test1_get))
 
-    test1_select = test1.select(('test1_id',), where='test1_id', equal=2)
+    test1_select = test1.rows(('test1_id',), where='test1_id', equal=2)
     print('test1_select: {0}\n'.format(test1_select))
 
     test1_count = test1.count(where='test1_id', equal=3)
@@ -35,14 +35,14 @@ def test_orm(g):
     test1_delete = test1.delete(test1_insert)
     print('test1_delete: {0}\n'.format(test1_delete))
 
-    g.resp.body = 'test_orm'
+    this.resp.body = 'test_orm'
 
 
-def test_aes(g):
-    a = AESCrypto(g.cfg['aes_crypto']['key'])
+def test_aes(this):
+    a = AESCrypto(this.cfg['aes_crypto']['key'])
     e = a.encrypt('한글')
     print(e)
     d = a.decrypt(e)
     print(d)
 
-    g.resp.body = 'test_aes'
+    this.resp.body = 'test_aes'
