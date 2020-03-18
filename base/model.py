@@ -87,13 +87,13 @@ class Model:
         where_clause = ''
         if where != '':
             if equal is not None:
-                where_clause = 'WHERE deleted_time = 0 AND {0} = %s'.format(where)
+                where_clause = 'WHERE delete_time = 0 AND {0} = %s'.format(where)
                 param_list.append(equal)
             elif like != '':
-                where_clause = 'WHERE deleted_time = 0 AND {0} LIKE %s'.format(where)
+                where_clause = 'WHERE delete_time = 0 AND {0} LIKE %s'.format(where)
                 param_list.append('%{0}%'.format(like))
             elif len(in_) > 0:
-                where_clause = 'WHERE deleted_time = 0 AND {0} IN (%s)'.format(where)
+                where_clause = 'WHERE delete_time = 0 AND {0} IN (%s)'.format(where)
                 param_list.append(', '.join(in_))
 
         order_clause = ''
@@ -116,7 +116,7 @@ class Model:
             return self.fetchall()
 
     def get(self, key):
-        sql = 'SELECT * FROM {0}.{1} WHERE {2} = %s AND deleted_time = 0 LIMIT 1 OFFSET 0'.format(self.db_name,
+        sql = 'SELECT * FROM {0}.{1} WHERE {2} = %s AND delete_time = 0 LIMIT 1 OFFSET 0'.format(self.db_name,
                                                                                                   self.table_name,
                                                                                                   self.primary_key)
         params = (key,)
@@ -173,10 +173,10 @@ class Model:
     def delete(self, key):
         # sql = 'DELETE FROM {0}.{1} WHERE {2} = %s'.format(self.db_name, self.table_name, self.primary_key)
 
-        deleted_time = DateTime(datetime.now()).time_stamp()
-        sql = 'UPDATE {0}.{1} SET deleted_time = %s WHERE {2} = %s'.format(self.db_name, self.table_name,
-                                                                           self.primary_key)
-        params = (key, deleted_time)
+        delete_time = DateTime(datetime.now()).time_stamp()
+        sql = 'UPDATE {0}.{1} SET delete_time = %s WHERE {2} = %s'.format(self.db_name, self.table_name,
+                                                                          self.primary_key)
+        params = (key, delete_time)
         self._print_if_debug(sql % params)
 
         self.execute(sql, params)
