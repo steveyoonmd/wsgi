@@ -32,6 +32,6 @@ zip -r9 ./build_$DATE.zip ./libs
 zip -r9 ./build_$DATE.zip ./static
 
 zip -g build_$DATE.zip cfg.json
-zip -g build_$DATE.zip app.py
+zip -g build_$DATE.zip lambda_function.py
 
 # aws lambda update-function-code --function-name my-function --zip-file fileb://build_$DATE.zip
