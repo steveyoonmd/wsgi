@@ -26,7 +26,7 @@ class Response:
 
         self.status = '{0} {1}'.format(http_status_code, http_status_text)
         if http_status_code != HttpStatusCode.OK:
-            self.headers = [('Content-Type', 'application/json')]
+            self.headers.extend([('Content-Type', 'application/json; utf-8')])
             self.body = json.dumps({http_status_code: http_status_text})
 
     # SameSite: Strict, Lax, None

@@ -41,7 +41,7 @@ class Request:
                 continue
             self.cookies[unquote(name_value_split[0])] = unquote(name_value_split[1])
 
-        if self.content_type.startswith('application/json'):
+        if self.content_type.startswith('application/json; charset=utf-8'):
             content_length = int(self.env.get('CONTENT_LENGTH', 0))
             if content_length == 0:
                 raise ValueError('CONTENT_LENGTH')

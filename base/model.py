@@ -104,7 +104,7 @@ class Model:
             order_clause = 'ORDER BY {0} DESC'.format(order_desc)
 
         limit_clause = 'LIMIT %s OFFSET %s'
-        param_list.extend((limit, offset))
+        param_list.extend([limit, offset])
 
         sql = '{0} {1} {2} {3}'.format(select_clause, where_clause, order_clause, limit_clause)
         params = tuple(param_list)

@@ -23,7 +23,7 @@ class Handler:
         self.resp = Response(self.cfg)
 
     def handle_func(self, func):
-        if self.req.origin != '' or self.req.origin in self.cfg['access_allowed_http_origins']:
+        if self.req.origin != '' and self.req.origin in self.cfg['access_allowed_http_origins']:
             self.resp.headers.extend([
                 ('Access-Control-Allow-Origin', self.req.origin),
                 ('Access-Control-Allow-Methods', 'DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT'),
@@ -49,11 +49,11 @@ class Handler:
         finally:
             self.db.close()
 
-        resp_content_type = ('Content-Type', 'text/plain; charset=utf-8')
+        resp_content_type_header = ('Content-Type', 'text/plain; charset=utf-8')
         if not isinstance(self.resp.body, str):
             self.resp.body = json.dumps(self.resp.body)
-            resp_content_type = ('Content-Type', 'application/json; charset=utf-8')
-        self.resp.headers.append(resp_content_type)
+            resp_content_type_header = ('Content-Type', 'application/json; charset=utf-8')
+        self.resp.headers.append(resp_content_type_header)
 
         self.resp.set_http_status(HttpStatusCode.OK)
         self._start_resp(self.resp.status, self.resp.headers)
