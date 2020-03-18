@@ -16,6 +16,7 @@ class Response:
         self.headers = []
         self.body = DictAsObj({
             'err': Error.UNKNOWN,
+            'msg': '',
             'url': '',
             'dat': None,
         })
@@ -34,7 +35,7 @@ class Response:
         cookie_parts = ['{0}={1}'.format(quote(name), quote(value))]
 
         if expires_in_minutes > 0:
-            expires = DateTime(tzinfo=timezone.utc).dt + timedelta(minutes=expires_in_minutes)
+            expires = DateTime().dt + timedelta(minutes=expires_in_minutes)
             cookie_parts.append('Expires={0}'.format(expires.strftime('%a, %d %b %Y %H:%M:%S GMT')))
 
         cookie_parts.append('Path={0}'.format(path))
