@@ -1,3 +1,5 @@
+import sys
+import time
 from wsgiref.simple_server import make_server
 
 from base.application import Application
@@ -13,13 +15,16 @@ def run():
     try:
         server = make_server(host, port, app)
         print('starting server on {0}:{1}..'.format(host, port))
+
         # server.handle_request()
         server.serve_forever()
     except KeyboardInterrupt:
         print('stopping server..')
+
+        server.server_close()
+        time.sleep(1)
     finally:
-        if server is not None:
-            server.server_close()
+        sys.exit()
 
 
 run()
