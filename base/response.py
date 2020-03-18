@@ -53,5 +53,4 @@ class Response:
         if same_site != '':
             cookie_parts.append('SameSite={0}'.format(same_site))
 
-        set_cookie_header = ('Set-Cookie', '; '.join(cookie_parts))
-        self.headers.append(set_cookie_header)
+        self.headers.extend([('Set-Cookie', '; '.join(cookie_parts))])

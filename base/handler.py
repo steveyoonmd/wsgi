@@ -49,11 +49,11 @@ class Handler:
         finally:
             self.db.close()
 
-        resp_content_type_header = ('Content-Type', 'text/plain; charset=utf-8')
-        if not isinstance(self.resp.body, str):
+        if isinstance(self.resp.body, str):
+            self.resp.headers.extend([('Content-Type', 'text/plain; charset=utf-8')])
+        else:
+            self.resp.headers.extend([('Content-Type', 'application/json; charset=utf-8')])
             self.resp.body = json.dumps(self.resp.body)
-            resp_content_type_header = ('Content-Type', 'application/json; charset=utf-8')
-        self.resp.headers.append(resp_content_type_header)
 
         self.resp.set_http_status(HttpStatusCode.OK)
         self._start_resp(self.resp.status, self.resp.headers)
