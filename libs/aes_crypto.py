@@ -2,13 +2,12 @@ import hashlib
 import secrets
 from base64 import b64encode, b64decode
 
-crypto_imported = True
 try:
     from Crypto.Cipher import AES
     # from Crypto import Random
 except ImportError as ex:
     print(ex)
-    crypto_imported = False
+    AES = None
 
 
 def md5hex(plain_text):
@@ -32,7 +31,7 @@ class AESCrypto:
         return b[:-ord(b[len(b) - 1:])]
 
     def encrypt(self, plain_text):
-        if not crypto_imported:
+        if AES is None:
             return plain_text
 
         padded = self.pad(plain_text)
@@ -47,7 +46,7 @@ class AESCrypto:
         return encoded.replace('+', '_')
 
     def decrypt(self, b64encoded):
-        if not crypto_imported:
+        if AES is None:
             return b64encoded
 
         # url safe base64
